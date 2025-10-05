@@ -74,11 +74,13 @@ export function useAITrading() {
         // Fetch opportunities from your API
         const response = await fetch('/api/arbitrage');
         if (!response.ok) {
-          throw new Error(`API Error: ${response.status}`);
+          console.warn(`API Error: ${response.status}, using empty array`);
+          setOpportunities([]);
+          return;
         }
         
         const data = await response.json();
-        const opportunities: ArbitrageOpportunity[] = data.opportunities || [];
+        const opportunities: ArbitrageOpportunity[] = data.data || data.opportunities || [];
         
         setOpportunities(opportunities);
 

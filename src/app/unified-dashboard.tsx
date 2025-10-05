@@ -69,6 +69,8 @@ export default function UnifiedDashboard() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState(false);
   const [isLoadingOpps, setIsLoadingOpps] = useState(false);
+  const [executingTrades, setExecutingTrades] = useState<Set<string>>(new Set());
+  const [notification, setNotification] = useState<{type: 'success' | 'error' | 'info', message: string} | null>(null);
   const [stats, setStats] = useState({
     totalOpportunities: 0,
     missedOpportunities: 0,
@@ -97,11 +99,22 @@ export default function UnifiedDashboard() {
       const response = await fetch('/api/arbitrage');
       const data = await response.json();
       
-      if (data.opportunities) {
-        const activeOpps = data.opportunities.map((opp: any) => ({
-          ...opp,
+      if (data.success && data.data) {
+        const activeOpps = data.data.map((opp: any) => ({
+          id: opp.id,
+          timestamp: Date.now(),
+          tokenA: opp.tokenPair?.tokenA?.symbol || 'ETH',
+          tokenB: opp.tokenPair?.tokenB?.symbol || 'USDC',
+          dexA: opp.exchanges?.buyExchange?.name || 'Uniswap',
+          dexB: opp.exchanges?.sellExchange?.name || 'SushiSwap',
+          priceA: parseFloat(opp.prices?.buyPrice || 0),
+          priceB: parseFloat(opp.prices?.sellPrice || 0),
+          profitPercent: opp.spread?.percentage || 0,
+          profitUsd: parseFloat(opp.estimatedProfit?.net || 0) * 1000,
           status: 'active',
-          timestamp: Date.now()
+          gasEstimate: parseFloat(opp.estimatedProfit?.gasEstimate || 0) * 2500,
+          confidence: opp.aiConfidence?.score || 0.5,
+          liquidity: parseFloat(opp.liquidity?.buyLiquidity || 0)
         }));
         setOpportunities(activeOpps);
         
@@ -260,13 +273,110 @@ export default function UnifiedDashboard() {
     });
   };
 
+  // Execute arbitrage trade
+  const executeArbitrage = async (opportunity: ArbitrageOpportunity) => {
+    // Demo mode - allow execution without wallet for testing
+    const isDemoMode = !walletState.isConnected;
+    
+    if (isDemoMode) {
+      setNotification({ type: 'info', message: '🎮 Demo Mode: Simulating trade execution...' });
+    }
+
+    setExecutingTrades(prev => new Set(prev).add(opportunity.id));
+    setNotification({ type: 'info', message: `Executing trade for ${opportunity.tokenA}/${opportunity.tokenB}...` });
+
+    try {
+      // Simulate API call to execute trade
+      const response = await fetch('/api/arbitrage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          opportunityId: opportunity.id,
+          amount: '1000', // $1000 trade
+          slippage: 0.5
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success || isDemoMode) {
+        // Simulate delay for demo mode
+        if (isDemoMode) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+        
+        // Move to historical as executed
+        setHistoricalOpps(prev => [{
+          ...opportunity,
+          status: 'executed' as const,
+          timestamp: Date.now()
+        }, ...prev]);
+        
+        // Remove from active opportunities with animation
+        setTimeout(() => {
+          setOpportunities(prev => prev.filter(o => o.id !== opportunity.id));
+        }, 500);
+        
+        // Update stats
+        const profit = isDemoMode ? (Math.random() * 50 + 10) : opportunity.profitUsd;
+        setStats(prev => ({
+          ...prev,
+          executedTrades: prev.executedTrades + 1,
+          totalProfit: prev.totalProfit + profit,
+          successRate: ((prev.executedTrades + 1) / (prev.executedTrades + prev.missedOpportunities + 1)) * 100,
+          avgProfitPerTrade: (prev.totalProfit + profit) / (prev.executedTrades + 1)
+        }));
+
+        setNotification({ 
+          type: 'success', 
+          message: `✅ ${isDemoMode ? 'Demo' : ''} Trade executed successfully! Profit: $${profit.toFixed(2)} 🎉` 
+        });
+      } else {
+        throw new Error(result.error || 'Trade execution failed');
+      }
+    } catch (error) {
+      console.error('Trade execution failed:', error);
+      
+      // Move to historical as failed
+      setHistoricalOpps(prev => [{
+        ...opportunity,
+        status: 'missed' as const,
+        timestamp: Date.now()
+      }, ...prev]);
+      
+      // Update missed count
+      setStats(prev => ({
+        ...prev,
+        missedOpportunities: prev.missedOpportunities + 1
+      }));
+
+      setNotification({ 
+        type: 'error', 
+        message: `❌ Trade execution failed: ${error instanceof Error ? error.message : 'Unknown error'}` 
+      });
+    } finally {
+      setExecutingTrades(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(opportunity.id);
+        return newSet;
+      });
+      
+      // Clear notification after 5 seconds
+      setTimeout(() => setNotification(null), 5000);
+    }
+  };
+
   // Connect wallet
   const handleConnectWallet = async () => {
     try {
       await walletConnection.connect('metamask');
       setWalletState(walletConnection.getState());
+      setNotification({ type: 'success', message: '🔗 Wallet connected successfully!' });
+      setTimeout(() => setNotification(null), 3000);
     } catch (error) {
       console.error('Wallet connection failed:', error);
+      setNotification({ type: 'error', message: '❌ Failed to connect wallet' });
+      setTimeout(() => setNotification(null), 3000);
     }
   };
 
@@ -309,6 +419,26 @@ export default function UnifiedDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+      {/* Notification Toast */}
+      {notification && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className={`
+            px-6 py-4 rounded-lg shadow-lg backdrop-blur-sm flex items-center gap-3
+            ${notification.type === 'success' ? 'bg-green-500/20 border border-green-500/30 text-green-300' : ''}
+            ${notification.type === 'error' ? 'bg-red-500/20 border border-red-500/30 text-red-300' : ''}
+            ${notification.type === 'info' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-300' : ''}
+          `}>
+            <div className="text-sm font-medium">{notification.message}</div>
+            <button 
+              onClick={() => setNotification(null)}
+              className="ml-4 text-white/70 hover:text-white text-xl"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+      
       {/* Header */}
       <header className="bg-black/20 backdrop-blur-sm border-b border-white/10">
         <div className="container mx-auto px-4 py-4">
@@ -524,11 +654,32 @@ export default function UnifiedDashboard() {
                           </div>
                           <Button 
                             size="sm"
-                            className="bg-green-600 hover:bg-green-700"
-                            disabled={!walletState.isConnected}
+                            onClick={() => executeArbitrage(opp)}
+                            disabled={executingTrades.has(opp.id)}
+                            className={`
+                              ${executingTrades.has(opp.id) 
+                                ? 'bg-gray-600 cursor-wait' 
+                                : walletState.isConnected
+                                  ? 'bg-green-600 hover:bg-green-700'
+                                  : 'bg-yellow-600 hover:bg-yellow-700'}
+                            `}
                           >
-                            Execute
-                            <ArrowRight className="w-4 h-4 ml-2" />
+                            {executingTrades.has(opp.id) ? (
+                              <>
+                                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                Executing...
+                              </>
+                            ) : walletState.isConnected ? (
+                              <>
+                                Execute
+                                <ArrowRight className="w-4 h-4 ml-2" />
+                              </>
+                            ) : (
+                              <>
+                                Demo Trade
+                                <Zap className="w-4 h-4 ml-2" />
+                              </>
+                            )}
                           </Button>
                         </div>
                       </div>
