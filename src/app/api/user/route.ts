@@ -62,8 +62,15 @@ export async function POST(request: NextRequest) {
     switch (action) {
       case 'updatePreferences':
         // Update user preferences
+        const userIdentifier = auth.address || auth.fid?.toString()
+        if (!userIdentifier) {
+          return NextResponse.json(
+            { success: false, error: 'No user identifier found' },
+            { status: 400 }
+          )
+        }
         const updatedPrefs = await updateUserPreferences(
-          auth.address || auth.fid?.toString(),
+          userIdentifier,
           data
         )
         return NextResponse.json({

@@ -1,0 +1,89 @@
+{
+  "name": "arbitips-news-server",
+  "version": "1.0.0",
+  "description": "MCP server for fetching blockchain and DeFi news for ArbiTips",
+  "tools": [
+    {
+      "name": "fetch-crypto-news",
+      "description": "Fetch latest cryptocurrency and blockchain news",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["defi", "blockchain", "trading", "base-network", "arbitrage"],
+            "description": "News category to fetch"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 10,
+            "description": "Number of articles to fetch"
+          },
+          "since": {
+            "type": "string",
+            "description": "Fetch news since this timestamp (ISO format)"
+          }
+        },
+        "required": ["category"]
+      }
+    },
+    {
+      "name": "analyze-news-relevance",
+      "description": "Analyze news relevance to arbitrage trading",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "News article title"
+          },
+          "content": {
+            "type": "string",
+            "description": "News article content"
+          }
+        },
+        "required": ["title", "content"]
+      }
+    },
+    {
+      "name": "generate-trading-tip",
+      "description": "Generate trading tip based on news content",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "news_content": {
+            "type": "string",
+            "description": "News article content to analyze"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["risk", "strategy", "technical", "market"],
+            "description": "Type of trading tip to generate"
+          }
+        },
+        "required": ["news_content", "category"]
+      }
+    }
+  ],
+  "resources": [
+    {
+      "uri": "https://api.coindesk.com/v1/news",
+      "name": "coindesk-news",
+      "description": "CoinDesk news API"
+    },
+    {
+      "uri": "https://newsapi.org/v2/everything?q=cryptocurrency+OR+blockchain+OR+DeFi",
+      "name": "general-crypto-news",
+      "description": "General crypto news from NewsAPI"
+    },
+    {
+      "uri": "https://api.coingecko.com/api/v3/news",
+      "name": "coingecko-news",
+      "description": "CoinGecko news API"
+    }
+  ],
+  "server": {
+    "host": "localhost",
+    "port": 3002
+  }
+}

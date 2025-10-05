@@ -1,11 +1,11 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useAccount, useNetwork, useSwitchNetwork } from '../lib/providers'
+import { useAccount, useNetwork, useSwitchNetwork } from '../../lib/providers'
 
 // Components
-import { Header } from '../components/Header'
-import { NewsSection } from '../components/NewsSection'
+import { Header } from '../../components/Header'
+import { NewsSection } from '../../components/NewsSection'
 
 // Types
 interface ArbitrageOpportunity {

@@ -1,0 +1,56 @@
+[package]
+name = "arbitips-bot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.0", features = ["full"] }
+
+# HTTP client
+reqwest = { version = "0.11", features = ["json"] }
+
+# JSON serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Ethereum integration
+ethers = "2.0"
+
+# WebSocket support
+tokio-tungstenite = "0.20"
+futures-util = "0.3"
+
+# Random number generation
+rand = "0.8"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Logging
+env_logger = "0.10"
+log = "0.4"
+
+# Configuration
+config = "0.13"
+dotenv = "0.15"
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# CLI argument parsing
+clap = { version = "4.0", features = ["derive"] }
+
+# Metrics and monitoring
+prometheus = "0.13"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = true

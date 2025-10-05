@@ -12,7 +12,9 @@
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "deploy:contracts": "cd contracts && npx hardhat deploy --network base",
-    "compile:contracts": "cd contracts && npx hardhat compile"
+    "compile:contracts": "cd contracts && npx hardhat compile",
+    "build:extension": "node scripts/build-extension.js",
+    "pack:extension": "npm run build:extension && cd extension && tar -czf ../arbitips-extension.zip *"
   },
   "dependencies": {
     "@farcaster/auth-client": "^0.3.0",
@@ -33,7 +35,7 @@
     "@wagmi/core": "^2.14.12",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
-    "connectkit": "^1.8.2",
+    "connectkit": "^1.6.0",
     "lucide-react": "^0.469.0",
     "next": "^14.0.0",
     "react": "^18.2.0",
@@ -41,7 +43,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "viem": "^2.23.6",
-    "wagmi": "^2.14.12",
+    "wagmi": "^1.4.13",
     "zod": "^3.24.2"
   },
   "devDependencies": {
@@ -60,7 +62,7 @@
     "postcss": "^8.4.32",
     "tailwindcss": "^3.3.6",
     "typescript": "^5.3.0",
-    "vitest": "^1.0.0"
+    "vitest": "^3.2.4"
   },
   "keywords": [
     "arbitrage",

@@ -1,58 +1,77 @@
-import { useProfile, useSignIn } from '@farcaster/auth-kit'
 import { FarcasterUser } from '@/types'
+import { useState, useEffect } from 'react'
 
+// Mock Farcaster auth implementation for development
+// In production, replace with actual @farcaster/auth-kit integration
 export function useFarcasterAuth() {
-  const {
-    isSuccess: isSignedIn,
-    isLoading: isSigningIn,
-    isError: signInError,
-    signIn,
-    message,
-    signature,
-    fid,
-    username,
-    displayName,
-    pfpUrl,
-    bio,
-    custodyAddress,
-    verifications,
-  } = useSignIn()
+  const [user, setUser] = useState<FarcasterUser | null>(null)
+  const [isSignedIn, setIsSignedIn] = useState(false)
+  const [isSigningIn, setIsSigningIn] = useState(false)
+  const [signInError, setSignInError] = useState<Error | null>(null)
 
-  const { data: profile, isLoading: isLoadingProfile } = useProfile({
-    fid: fid || undefined,
-  })
-
-  const user: FarcasterUser | null = fid ? {
-    fid,
-    username: username || '',
-    displayName: displayName || '',
-    avatar: pfpUrl || '',
-    bio: bio || '',
-    followerCount: profile?.follower_count || 0,
-    followingCount: profile?.following_count || 0,
-    verifications: verifications || [],
-    isConnected: isSignedIn,
-  } : null
+  // Check for existing auth on mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem('farcaster_user')
+    if (savedUser) {
+      try {
+        const userData = JSON.parse(savedUser)
+        setUser(userData)
+        setIsSignedIn(true)
+      } catch (error) {
+        console.error('Failed to parse saved user:', error)
+        localStorage.removeItem('farcaster_user')
+      }
+    }
+  }, [])
 
   const signInWithFarcaster = async () => {
+    setIsSigningIn(true)
+    setSignInError(null)
+    
     try {
-      await signIn()
+      // Mock sign-in process - replace with actual Farcaster auth
+      await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
+      
+      const mockUser: FarcasterUser = {
+        fid: Math.floor(Math.random() * 100000) + 1000,
+        username: `user${Math.floor(Math.random() * 10000)}`,
+        displayName: 'Demo User',
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${Math.random()}`,
+        bio: 'Arbitrage enthusiast using ArbiTips',
+        followerCount: Math.floor(Math.random() * 1000),
+        followingCount: Math.floor(Math.random() * 500),
+        verifications: [],
+        isConnected: true,
+      }
+      
+      setUser(mockUser)
+      setIsSignedIn(true)
+      localStorage.setItem('farcaster_user', JSON.stringify(mockUser))
     } catch (error) {
+      setSignInError(error as Error)
       console.error('Failed to sign in with Farcaster:', error)
-      throw error
+    } finally {
+      setIsSigningIn(false)
     }
+  }
+
+  const signOut = () => {
+    setUser(null)
+    setIsSignedIn(false)
+    localStorage.removeItem('farcaster_user')
   }
 
   return {
     user,
     isSignedIn,
     isSigningIn,
-    isLoadingProfile,
+    isLoadingProfile: false,
     signInError,
     signIn: signInWithFarcaster,
-    custodyAddress,
-    message,
-    signature,
+    signOut,
+    custodyAddress: user?.verifications[0] || null,
+    message: null,
+    signature: null,
   }
 }
 

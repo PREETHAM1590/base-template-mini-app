@@ -12,12 +12,29 @@ async function main() {
   const treasuryAddress = process.env.TREASURY_ADDRESS || deployer.address;
   console.log("Treasury address:", treasuryAddress);
   
+  // Deploy CEX Bridge first
+  console.log("Deploying CEX Bridge...");
+  const CEXBridge = await ethers.getContractFactory("CEXBridge");
+  const cexBridge = await CEXBridge.deploy(deployer.address); // Deployer as initial operator
+  
+  await cexBridge.deployed();
+  console.log("CEX Bridge deployed to:", cexBridge.address);
+  
+  // Configure CEX Bridge with supported tokens
+  await cexBridge.setSupportedToken("0x4200000000000000000000000000000000000006", true); // WETH on Base
+  await cexBridge.setSupportedToken("0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", true); // USDC on Base
+  console.log("CEX Bridge configured with WETH and USDC support");
+  
   // Deploy ArbitrageExecutor
   const ArbitrageExecutor = await ethers.getContractFactory("ArbitrageExecutor");
-  const arbitrageExecutor = await ArbitrageExecutor.deploy(treasuryAddress);
+  const arbitrageExecutor = await ArbitrageExecutor.deploy(
+    "0xE592427A0AEce92De3Edee1F18E0157C05861564", // Uniswap V3 Router
+    cexBridge.address, // CEX Bridge
+    "0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43", // Aerodrome Router  
+    "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506"  // SushiSwap Router
+  );
   
   await arbitrageExecutor.deployed();
-  
   console.log("ArbitrageExecutor deployed to:", arbitrageExecutor.address);
   
   // Set up authorized routers (Base network DEX routers)

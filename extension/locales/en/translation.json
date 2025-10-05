@@ -1,0 +1,19 @@
+{
+  "arbitrage": "Arbitrage",
+  "scan": "Scan",
+  "opportunities": "Opportunities", 
+  "scanner": "Scanner",
+  "ai_powered": "AI Powered",
+  "base_network": "Base Network",
+  "ready_to_scan": "Ready to scan",
+  "scanning": "Scanning...",
+  "scan_for_opportunities": "Scan for Opportunities",
+  "open_dashboard": "Open Dashboard",
+  "settings": "Settings",
+  "found_opportunities": "Found {{count}} opportunities",
+  "scan_failed": "Scan failed",
+  "extension_loaded": "ArbiTips extension loaded",
+  "no_opportunities": "No arbitrage opportunities found",
+  "error_occurred": "An error occurred",
+  "try_again": "Try again"
+}
