@@ -1,0 +1,42 @@
+{
+  "name": "arbitips",
+  "version": 2,
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "functions": {
+    "app/api/arbitrage/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/user/route.ts": {
+      "maxDuration": 10
+    }
+  },
+  "env": {
+    "NEXT_PUBLIC_APP_URL": "@next_public_app_url",
+    "OPENAI_API_KEY": "@openai_api_key",
+    "NEYNAR_API_KEY": "@neynar_api_key"
+  },
+  "rewrites": [
+    {
+      "source": "/.well-known/farcaster.json",
+      "destination": "/farcaster.json"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/farcaster.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "key": "Cache-Control", 
+          "value": "public, max-age=300"
+        }
+      ]
+    }
+  ]
+}
