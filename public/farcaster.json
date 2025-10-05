@@ -1,0 +1,68 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEyMzQ1NiwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDEyMzQ1NiJ9",
+    "payload": "eyJkb21haW4iOiJhcmJpdGlwcy5hcHAifQ",
+    "signature": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234"
+  },
+  "frame": {
+    "name": "ArbiTips",
+    "url": "https://arbitips.app",
+    "iconUrl": "https://arbitips.app/icon-192x192.png",
+    "splashImageUrl": "https://arbitips.app/splash.png",
+    "splashBackgroundColor": "#000000",
+    "homeUrl": "https://arbitips.app"
+  },
+  "miniapp": {
+    "name": "ArbiTips",
+    "description": "AI-powered arbitrage opportunities scanner for Base network. Find and execute profitable trades across multiple DEXs with real-time price monitoring and smart contract automation.",
+    "icon": "https://arbitips.app/icon-192x192.png",
+    "cover": "https://arbitips.app/cover.png",
+    "publisher": "ArbiTips Team",
+    "license": "MIT",
+    "version": "1.0.0",
+    "primary_category": "Finance",
+    "categories": ["Finance", "Trading", "DeFi"],
+    "tags": ["arbitrage", "defi", "trading", "ai", "base", "dex"],
+    "website": "https://arbitips.app",
+    "social": {
+      "twitter": "@ArbiTips",
+      "farcaster": "@arbitips",
+      "github": "https://github.com/arbitips/arbitips"
+    },
+    "screenshots": [
+      "https://arbitips.app/screenshots/dashboard.png",
+      "https://arbitips.app/screenshots/opportunities.png",
+      "https://arbitips.app/screenshots/stats.png"
+    ],
+    "features": [
+      "Real-time arbitrage opportunity detection",
+      "Multi-DEX price comparison (Uniswap V3, SushiSwap, PancakeSwap, Aerodrome)",
+      "AI-powered profit prediction and risk assessment",
+      "One-click trade execution with smart contracts",
+      "Social sharing of trading performance",
+      "Mobile-first responsive design"
+    ],
+    "permissions": [
+      "wallet_connect",
+      "transaction_signing",
+      "network_requests"
+    ],
+    "supported_platforms": ["ios", "android", "web"],
+    "minimum_version": {
+      "ios": "16.0",
+      "android": "8.0"
+    },
+    "privacy": {
+      "data_collection": "minimal",
+      "data_usage": "Trading execution and analytics only",
+      "data_sharing": "No personal data shared with third parties"
+    },
+    "compliance": {
+      "base_miniapp_compliant": true,
+      "no_copyrighted_assets": true,
+      "short_onboarding": true,
+      "minimal_data_collection": true,
+      "cross_platform_compatible": true
+    }
+  }
+}

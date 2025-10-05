@@ -1,0 +1,25 @@
+{
+  "name": "ArbiTips - AI Arbitrage Scanner",
+  "short_name": "ArbiTips",
+  "description": "AI-powered arbitrage opportunities scanner for Base network",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#3B82F6",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png", 
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["finance", "utilities"],
+  "lang": "en",
+  "orientation": "portrait"
+}

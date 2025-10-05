@@ -1,0 +1,1 @@
+export { OpportunityCard } from './index'
