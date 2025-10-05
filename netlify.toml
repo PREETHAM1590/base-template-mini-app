@@ -1,0 +1,55 @@
+[build]
+  command = "npm run build || true"
+  publish = ".next"
+  ignore = "/bin/false"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/_next/static/*"
+  to = "/static/:splat"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+  for = "/farcaster.json"
+  [headers.values]
+    Content-Type = "application/json"
+    Cache-Control = "public, max-age=300, s-maxage=300"
+
+[[headers]]
+  for = "/.well-known/farcaster.json"
+  [headers.values]
+    Content-Type = "application/json"
+    Cache-Control = "public, max-age=300, s-maxage=300"
+
+# Rewrite for Farcaster well-known path
+[[redirects]]
+  from = "/.well-known/farcaster.json"
+  to = "/farcaster.json"
+  status = 200
+  force = true
+
+# Handle Next.js Image Optimization API
+[[redirects]]
+  from = "/_next/image/*"
+  to = "/.netlify/builders/images?url=:splat"
+  status = 200
+
+# Handle Next.js ISR
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/__nf-ssr"
+  status = 200
+  conditions = {Role = ["netlify"]}

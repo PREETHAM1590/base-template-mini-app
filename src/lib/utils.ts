@@ -23,6 +23,14 @@ export function formatPercentage(value: number, decimals = 2): string {
   return `${value.toFixed(decimals)}%`
 }
 
+export function formatPercent(value: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'percent',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1
+  }).format(value / 100);
+}
+
 export function formatAddress(address: string, length = 6): string {
   if (!address) return ''
   return `${address.slice(0, length)}...${address.slice(-4)}`

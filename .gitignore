@@ -45,3 +45,5 @@ contracts/typechain-types
 
 # OS
 Thumbs.db
+# Local Netlify folder
+.netlify
